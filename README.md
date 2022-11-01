@@ -3,11 +3,13 @@ Projeto 1 de Organizações de Sistemas de Computação do Segundo Semestre de E
 
 Programa conta com:
 
- - Leitura de números inteiros e de operação desejada c/ verificação de input
+ - Leitura de números inteiros de um dígito e de operação desejada c/ verificação de input
 
  - Operações disponíveis:
  
      • Adição, Subtração, Divisão e Multiplicação
   
  - Impressão do resultado
+ 
+ - Opção para reinciar o programa ao finalizar
   
