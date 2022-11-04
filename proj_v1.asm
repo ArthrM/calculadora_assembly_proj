@@ -89,6 +89,7 @@ FINISH:
 
     MOV  AH , 4CH            ;Se a resposta for 'n', finaliza o programa e em seguida, encerra
     INT  21H
+main endp
 
 MULT proc
     XOR  CL , CL         
@@ -192,10 +193,12 @@ VALUE_1:
         INC  CH              ;Se não, incrementa CH para testar novamente
         CMP  CH , 3AH        ;Testa todos os numeros em ASCII do zero ao nove, para de testar ao chegar no ASCII 3Ah
         JNE VALIDATE_1
+
     MOV  DL , 08             ;Se chegou até aqui, o input não foi um número
     MOV  AH , 02
     INT  21H                 ;Impressão do caractere BS (Backspace)
     JMP VALUE_1              ;Repete a leitura até o input for um número
+
 VALID_1:
     SUB  AL , 30H            ;Subtrai 30h para transformar o ASCII do primeiro valor no número puro
     MOV  BL , AL             ;Armazena em BL
@@ -221,6 +224,7 @@ OPERATION:
     MOV  AH , 02
     INT  21H                ;Imprime o caractere BS (Backspace)
     JMP OPERATION           ;Repete a leitura até o input for uma operação válida
+
 VALID_OP:
     MOV  CL , AL            ;Armazena o ASCII da operação em CL
     MOV  AH , 02
@@ -243,6 +247,7 @@ VALUE_2:
     MOV  AH , 02
     INT  21H                ;Imprime o caractere BS (backspace)
     JMP VALUE_2             ;Repete até o input for um número
+
 VALID_2:
     SUB  AL , 30H           ;Subtrai 30h para transformar o ASCII do segundo valor no número puro
     MOV  BH , AL            ;Armazena em BH
@@ -250,5 +255,4 @@ VALID_2:
 ret
 READ endp
 
-main endp
 END main
