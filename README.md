@@ -11,5 +11,5 @@ Programa conta com:
   
  - Impressão do resultado
  
- - Opção para reinciar o programa ao finalizar
+ - Opção para reiniciar o programa ao finalizar
   
