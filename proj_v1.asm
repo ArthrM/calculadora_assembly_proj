@@ -1,4 +1,4 @@
-TITLE // Arthur Maluf  22005252 / João Pamponet 2200---- //
+TITLE // Arthur Maluf  22005252 / João Pamponet 22002241 //
 .model small
 print macro msg         ;Macro para a inicialização e impressão de mensagens
     MOV  AH , 09
