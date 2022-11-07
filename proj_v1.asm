@@ -179,43 +179,36 @@ READ endp
 
 MULT proc
     XOR  CL , CL         
-    MULTI:                       ;; MULTIPLICAÇÃO ;;  BL = Multiplicador / BH = Multiplicando  ;;
+    MULTI:                       ; MULTIPLICAÇÃO ;  BL = Multiplicador / BH = Multiplicando  ;
         SHR  BH , 1
-         JNC BIT_ZERO_MUL          ;    10 (2)  ;   - Shift para a direita no multiplicador, LSB vai para CF, verifica o CF.
-        ADD  CL , BL               ; x 101 (5)  ;   - Se CF = 1, multiplicará o multiplicando por 1 ou seja, 
-        BIT_ZERO_MUL:              ; ---------  ;    adiciona o próprio multiplicando ao registrador do resultado (CL)
-            SHL  BL , 1            ;    10      ;     Se CF = 0, multiplicará o multiplicando por 0, sem necessidade de adição
-            CMP  BH , 0            ;   000      ;   - Shift para a esquerda no multiplicando e seguir ao próximo dígito do multiplicador
-             JNE MULTI             ;  1000 +    ;   - Repete até que todos os digitos do multiplicador sejam percorridos
-            MOV  BH , CL           ; ---------  ;   - Armazena o resultado em BH e retorna
-ret                                ;  1010 (10) ;   
+         JNC BIT_ZERO_MUL         ;    10 (2)   ;   - Shift para a direita no multiplicador, LSB vai para CF, verifica o CF.
+        ADD  CL , BL              ; x 101 (5)   ;   - Se CF = 1, multiplicará o multiplicando por 1 ou seja, 
+        BIT_ZERO_MUL:             ; ---------   ;    adiciona o próprio multiplicando ao registrador do resultado (CL)
+            SHL  BL , 1           ;    10       ;     Se CF = 0, multiplicará o multiplicando por 0, sem necessidade de adição
+            CMP  BH , 0           ;   000       ;   - Shift para a esquerda no multiplicando e seguir ao próximo dígito do multiplicador
+             JNE MULTI            ;  1000 +     ;   - Repete até que todos os digitos do multiplicador sejam percorridos
+            MOV  BH , CL          ; ---------   ;
+ret                               ;  1010 (10)  ;     BH = Resultado ;;
 MULT endp
 
 DIVI proc
     XOR  CL , CL
     XOR  DX , DX
-    MOV  AH , 8
-    DIVIS:                     ;;         DIVISÃO         ;;  BL = Dividendo / BH = Divisor / CL = Resto / DL = Quociente  ;;
-        XOR  CH , CH             
-        XOR  DH , DH             ;   1001 (9) |_10_ (2)  ;   - Shift para a esquerda no dividendo, MSB vai para CF, verifica o CF.
-        SHL  BL , 1              ;  -0        0100  (4)  ;   - Insere o valor do CF no LSB de CL por meio do OR lógico após um Shift para esquerda em CL
-         JNC BIT_ZERO_DIV        ;  ---                  ;   - Testa se o divisor 'cabe' em CL: 
-        MOV  CH , 1              ;   10                  ;    Se sim, subtrai BH de CL e setta DH para 1
-        BIT_ZERO_DIV:            ;  -10                  ;    Se não, não subtrai e DH continua 0
-            SHL  CL , 1          ;  ----                 ;   - Insere o valor de DH no LSB de DL por meio do OR lógico após um Shift para a esquerda em DL
-            OR   CL , CH         ;    00                 ;   - Repete 8 vezes (Percorre todos os bits do registrador BL)
-            CMP  CL , BH         ;   - 0                 ;   - Armazena o quociente em BH e o resto em BL
-             JL  NO_SUB_DIV      ;   ----                ;
-            SUB  CL , BH         ;     01                ;
-            MOV  DH , 1          ;    - 0                ;
-            NO_SUB_DIV:          ;    ----               ;
-                SHL  DL , 1      ;      1  (1)           ;
-                OR   DL , DH
-                DEC  AH
-                 JNZ DIVIS
-    MOV  BH , DL
-    MOV  BL , CL
-ret
+    MOV  CH , BL                 ;        DIVISÃO        ;   CH = Dividendo / BH = Divisor  
+    MOV  AH , 8                 
+    DIVIS:                       ;   1001 (9) |_10_ (2)  ;   - ROL no CX, MSB do Dividendo (CH) vai para CL
+        ROL  CX , 1              ;  -0        0100  (4)  ;   - Verifica se o divisor 'cabe' em CL:
+        CMP  CL , BH             ;  ----                 ;    Se sim, subtrai BH de CL e coloca 1 no MSB de DH (MOV DH,80H)
+         JL  NO_SUB_DIV          ;    10                 ;    Se não, não subtrai e DH fica 0
+        SUB  CL , BH             ;   -10                 ;   - ROL em DX, MSB de DH vai para o Quociente (DL)
+        MOV  DH , 80H            ;   ----                ;
+        NO_SUB_DIV:              ;     00                ;   - Repete 8 vezes (percorre todos os bits do registrador CH
+            ROL  DX , 1          ;    - 0                ;
+            DEC  AH              ;    ----               ;
+             JNZ DIVIS           ;      01               ;
+    MOV  BH , DL                 ;     - 0               ;
+    MOV  BL , CL                 ;     ----              ;
+ret                              ;       1 (1)           ;    BL = Resto / BH = Quociente  ;
 DIVI endp
 
 RESULT proc
